@@ -1,14 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "songs.h"
 
-typedef struct song_node {
-  char name[256];
-  char artist[256];
-  struct song_node *next;
-} song_node;
-
-char * lower_string(char s[]) {
+void lower_string(char s[]) {
    int c = 0;
    while (s[c] != '\0') {
       if (s[c] >= 'A' && s[c] <= 'Z') {
@@ -16,17 +11,20 @@ char * lower_string(char s[]) {
       }
       c++;
    }
-   return s;
 }
 
 song_node * insert_front(song_node *front, char nameGiven[], char artistGiven[]) {
   song_node *newFront = (song_node*)malloc(sizeof(song_node));
   
-  nameGiven = lower_string(nameGiven);
-  artistGiven = lower_string(artistGiven);
+  char nameLower[256];
+  char artistLower[256];
+  strncpy(nameLower,nameGiven,256);
+  strncpy(artistLower,artistGiven,256);
+  lower_string(nameLower);
+  lower_string(artistLower);
 
-  strncpy(newFront->name,nameGiven,256);
-  strncpy(newFront->artist,artistGiven,256);
+  strncpy(newFront->name,nameLower,256);
+  strncpy(newFront->artist,artistLower,256);
   newFront->next = front;
 
   return newFront;
@@ -36,16 +34,19 @@ song_node * insert_song(song_node *front, char nameGiven[], char artistGiven[]) 
   song_node *current = front;
 
   char nameLower[256];
-  strncpy(nameLower,lower_string(nameGiven),256);
   char artistLower[256];
-  strncpy(artistLower,lower_string(artistGiven),256);
-
-  song_node *newNode = (song_node*)malloc(sizeof(song_node));
-  strncpy(newNode->name,nameLower,256);
-  strncpy(newNode->artist,artistLower,256);
+  strncpy(nameLower,nameGiven,256);
+  strncpy(artistLower,artistGiven,256);
+  lower_string(nameLower);
+  lower_string(artistLower);
 
   //IF LIST ONLY HAS ONE ELEMENT
   if (current->next == NULL) {
+    song_node *newNode = (song_node*)malloc(sizeof(song_node));
+    
+    strncpy(newNode->name,nameLower,256);
+    strncpy(newNode->artist,artistLower,256);
+
     if (strcmp(current->artist,newNode->artist) < 0) {
       current->next = newNode;
     } else {
@@ -57,7 +58,7 @@ song_node * insert_song(song_node *front, char nameGiven[], char artistGiven[]) 
       current = insert_song(current->next,nameLower,artistLower);
     }
     else {
-      current = insert_front(current->next,nameLower,artistLower);
+      current = insert_front(current,nameLower,artistLower);
     }
   }
 
@@ -71,7 +72,53 @@ void print_list(song_node *list) {
   }
 }
 
-void main() {
+song_node * first_song_by_name(song_node *front, char nameGiven[]) {
+  song_node * current = front;
+  
+  char nameLower[256];
+  strncpy(nameLower,nameGiven,256);
+  lower_string(nameLower);
+
+  while (current->next != NULL && strcmp(current->name,nameLower) != 0) {
+    current = current->next;
+  }
+  if (strcmp(current->name,nameLower) == 0) {
+    return current;
+  }
+  else {
+    return NULL;
+  }
+}
+
+song_node * first_song_by_artist(song_node *front, char artistGiven[]) {
+  song_node * current = front;
+
+  char artistLower[256];
+  strncpy(artistLower,artistGiven,256);
+  lower_string(artistLower);
+
+  while (current->next != NULL && strcmp(current->artist,artistLower) != 0) {
+    current = current->next;
+  }
+  if (strcmp(current->artist,artistLower) == 0) {
+    return current;
+  }
+  else {
+    return NULL;
+  }
+}
+
+song_node * random_song(song_node *front) {
+  int length = 0;
+  song_node * current = front;
+
+  while (current != NULL) {
+    length++;
+    current = current->next;
+  }
+}
+
+int main() {
   song_node *list;
   list = (song_node*)malloc(sizeof(song_node));
   strcpy(list->name,"fdsa");
@@ -79,7 +126,17 @@ void main() {
 
   list = insert_song(list,"ello","ello");
   print_list(list);
+  
+  printf("\n");
 
   list = insert_song(list,"ASDF","ASDF");
   print_list(list);
+
+  song_node *find_ello = first_song_by_name(list,"ello");
+  printf("find_ello name: %s\n",find_ello->name);
+
+  song_node *find_fdsa = first_song_by_artist(list,"fdsa");
+  printf("find_fdsa artist: %s\n",find_fdsa->artist);
+
+  return 0;
 }
