@@ -71,7 +71,11 @@ song_node * random_node(song_node *front) {
     length++;
     current = current->next;
   }
-
+  
+  if (length == 0) {
+    return NULL;
+  }
+  
   srand(time(NULL));
   int chosen = rand() % length;
 
@@ -217,6 +221,23 @@ void print_library(song_node *table[]) {
   }
 }
 
+void shuffle(song_node *table[]) {
+  printf("Shuffling...\n");
+  int i;
+  for (i = 0; i < 5; i++) {
+    srand(time(NULL)*i);
+    int chosen = 26;
+    while (table[chosen] == NULL || chosen == 26) {
+      chosen = rand() % 26;
+    }
+    song_node *chosenNode = NULL;
+    while (chosenNode == NULL) {
+      chosenNode = random_node(table[chosen]);
+    }
+    printf("%s - %s\n",chosenNode->artist,chosenNode->name);
+  }
+}
+
 int main() {
   //SETUP//
   song_node *table[26];
@@ -244,5 +265,9 @@ int main() {
   printf("\n===TESTING print_all_under_letter===\n");
   print_all_under_letter(table,'c');
   print_all_under_letter(table,'e');
+
+  printf("\n===TESTING shuffle===\n");
+  shuffle(table);
+  
   return 0;
 }
