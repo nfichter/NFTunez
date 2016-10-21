@@ -18,9 +18,11 @@ song_node * insert_node(song_node *prev, song_node *new) {
 }
 
 void print_list(song_node *list) {
-  printf("%s - %s\n",list->artist,list->name);
-  if (list->next != NULL) {
-    print_list(list->next);
+  if (list != NULL) {
+    printf("%s - %s\n",list->artist,list->name);
+    if (list->next != NULL) {
+      print_list(list->next);
+    }
   }
 }
 
@@ -124,28 +126,41 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
   strncpy(newNode->artist,artistLower,256);
 
   if (lib == NULL) {
-    return lib;
+    return newNode;
   }
+
+  printf("a: %s, aG: %s\n",lib->artist,artistLower);
   
-  if (strcmp(lib->artist,artistGiven) < 0) {
+  if (strcmp(lib->artist,artistLower) > 0) {
     return insert_front_node(lib,newNode);
   }
 
   int added = 0;
   song_node *current = lib;
   while (current->next != NULL && added == 0) {
-    if (strcmp(current->next->artist,artistGiven) < 0) {
+    if (strcmp(current->next->artist,artistLower) > 0) {
+      printf("hello\n");
       return insert_node(current,newNode);
       added = 1;
     }
     current = current->next;
   }
+  if (!added) {
+    current->next = newNode;
+  }
+  return lib;
+}
+
+song_node * search_for_name(song_node *lib, char nameGiven[]) {
+  
 }
 
 int main() {
   song_node *lib = (song_node*)malloc(sizeof(song_node));
   lib = 0;
-  lib = add_song(lib,"eee","eee");
+  char name1[256] = "eee";
+  char artist1[256] = "eee";
+  lib = add_song(lib,name1,artist1);
   print_list(lib);
   lib = add_song(lib,"ddd","ddd");
   print_list(lib);
