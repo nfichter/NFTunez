@@ -15,6 +15,7 @@ song_node * insert_node(song_node *prev, song_node *new) {
   song_node *temp = prev->next;
   prev->next = new;
   new->next = temp;
+  return prev;
 }
 
 void print_list(song_node *list) {
@@ -128,8 +129,6 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
   if (lib == NULL) {
     return newNode;
   }
-
-  printf("a: %s, aG: %s\n",lib->artist,artistLower);
   
   if (strcmp(lib->artist,artistLower) > 0) {
     return insert_front_node(lib,newNode);
@@ -139,8 +138,7 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
   song_node *current = lib;
   while (current->next != NULL && added == 0) {
     if (strcmp(current->next->artist,artistLower) > 0) {
-      printf("hello\n");
-      return insert_node(current,newNode);
+      insert_node(current,newNode);
       added = 1;
     }
     current = current->next;
@@ -152,7 +150,14 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
 }
 
 song_node * search_for_name(song_node *lib, char nameGiven[]) {
-  
+  song_node *current = lib;
+  while (current != NULL) {
+    if (strcmp(current->name,nameGiven) == 0) {
+      return current;
+    }
+    current = current->next;
+  }
+  return NULL;
 }
 
 int main() {
@@ -162,10 +167,23 @@ int main() {
   char artist1[256] = "eee";
   lib = add_song(lib,name1,artist1);
   print_list(lib);
+  printf("\n");
   lib = add_song(lib,"ddd","ddd");
   print_list(lib);
+  printf("\n");
   lib = add_song(lib,"fff","fff");
   print_list(lib);
-
+  printf("\n");
+  lib = add_song(lib,"hola","fff");
+  print_list(lib);
+  printf("\n");
+  lib = add_song(lib,"test2","ddd");
+  lib = add_song(lib,"test","ddd");
+  lib = add_song(lib,"test3","eee");
+  print_list(lib);
+  printf("\n");
+  
+  printf("Looking for hola...%p\n",search_for_name(lib,"hola"));
+  printf("Looking for hela...%p\n",search_for_name(lib,"hela"));
   return 0;
 }
