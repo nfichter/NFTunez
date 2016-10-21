@@ -19,7 +19,7 @@ song_node * insert_node(song_node *prev, song_node *new) {
 }
 
 void print_list(song_node *list) {
-  if (list != NULL) {
+  if (list != NULL && list->artist != NULL && list-> name != NULL) {
     printf("%s - %s\n",list->artist,list->name);
     if (list->next != NULL) {
       print_list(list->next);
@@ -114,7 +114,7 @@ void lower_string(char s[]) {
 }
 
 //ALL SONG FUNCTIONS//
-song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
+song_node * add_song_to_list(song_node *lib, char nameGiven[], char artistGiven[]) {
   char nameLower[256];
   char artistLower[256];
   strncpy(nameLower,nameGiven,256);
@@ -149,44 +149,100 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
   return lib;
 }
 
-song_node * search_for_name(song_node *lib, char nameGiven[]) {
-  return first_song_by_name(lib,nameGiven);
+void add_song(song_node *table[], char nameGiven[], char artistGiven[]) {
+  char nameLower[256];
+  char artistLower[256];
+  strncpy(nameLower,nameGiven,256);
+  strncpy(artistLower,artistGiven,256);
+  lower_string(nameLower);
+  lower_string(artistLower);
+  
+  table[artistLower[0]-97] = add_song_to_list(table[artistLower[0]-97],nameLower,artistLower);
 }
 
-song_node * search_for_artist(song_node *lib, char artistGiven[]) {
-  return first_song_by_artist(lib,artistGiven);
+song_node * search_for_name(song_node *table[], char nameGiven[]) {
+  int i;
+  for (i = 0; i < 26; i++) {
+    if (first_song_by_name(table[i],nameGiven) != NULL) {
+      return first_song_by_name(table[i],nameGiven);
+    }
+  }
+  return NULL;
+}
+
+song_node * search_for_artist(song_node *table[], char artistGiven[]) {
+  char artistLower[256];
+  strncpy(artistLower,artistGiven,256);
+  lower_string(artistLower);
+  
+  return first_song_by_artist(table[artistLower[0]-97],artistLower);
+}
+
+void print_all_under_letter(song_node *table[], char letterGiven) {
+  int c = letterGiven;
+  if (c >= 'A' && c <= 'Z') {
+    c += 32;
+  }
+  printf("Artists starting with %c\n",c);
+  if (table[c-97] != NULL) {
+    print_list(table[c-97]);
+  }
+}
+
+void print_all_under_artist(song_node *table[], char artistGiven[]) {
+  char artistLower[256];
+  strncpy(artistLower,artistGiven,256);
+  lower_string(artistLower);
+
+  printf("Songs by %s\n",artistLower);
+  
+  song_node *current = table[artistLower[0]-97];
+  if (current != NULL) {
+    while (current->next != NULL) {
+      if (strcmp(current->artist,artistLower) == 0) {
+	printf("%s - %s\n",current->artist,current->name);
+      }
+      current = current->next;
+    }
+    if (strcmp(current->artist,artistLower) == 0) {
+      printf("%s - %s\n",current->artist,current->name);
+    }
+  }
+}
+
+void print_library(song_node *table[]) {
+  int i;
+  for (i = 0; i < 26; i++) {
+    print_all_under_letter(table,i+97);
+  }
 }
 
 int main() {
-  song_node *lib = (song_node*)malloc(sizeof(song_node));
-  lib = 0;
-  char name1[256] = "eee";
-  char artist1[256] = "eee";
-  lib = add_song(lib,name1,artist1);
-  print_list(lib);
-  printf("\n");
-  lib = add_song(lib,"ddd","ddd");
-  print_list(lib);
-  printf("\n");
-  lib = add_song(lib,"fff","fff");
-  print_list(lib);
-  printf("\n");
-  lib = add_song(lib,"hola","fff");
-  print_list(lib);
-  printf("\n");
-  lib = add_song(lib,"test2","ddd");
-  lib = add_song(lib,"test","ddd");
-  lib = add_song(lib,"test3","eee");
-  print_list(lib);
-  printf("\n");
-  
-  printf("Looking for hola (name)...%p\n",search_for_name(lib,"hola"));
-  printf("Looking for hela (name)...%p\n",search_for_name(lib,"hela"));
-  printf("\n");
+  //SETUP//
+  song_node *table[26];
+  int i;
+  for (i = 0; i < 26; i++) {
+    table[i] = (song_node*)malloc(sizeof(song_node));
+    table[i] = 0;
+  }
 
-  printf("Looking for ddd (artist)...%p\n",search_for_artist(lib,"ddd"));
-  printf("Looking for abc (artist)...%p\n",search_for_artist(lib,"abc"));
-  printf("\n");
-  
+  printf("\n===TESTING add_song===\n");
+  add_song(table,"eee","eee");
+  add_song(table,"fff","eee");
+  add_song(table,"ddd","eee");
+  add_song(table,"test","abc");
+  add_song(table,"test1","xyz");
+  add_song(table,"test2","ebutnoteee");
+
+  printf("\n===TESTING print_library===\n");
+  print_library(table);
+
+  printf("\n===TESTING print_all_under_artist===\n");
+  print_all_under_artist(table,"ccc");
+  print_all_under_artist(table,"eee");
+
+  printf("\n===TESTING print_all_under_letter===\n");
+  print_all_under_letter(table,'c');
+  print_all_under_letter(table,'e');
   return 0;
 }
