@@ -34,6 +34,10 @@ song_node * first_song_by_name(song_node *front, char nameGiven[]) {
   strncpy(nameLower,nameGiven,256);
   lower_string(nameLower);
 
+  if (current == NULL) {
+    return NULL;
+  }
+  
   while (current->next != NULL && strcmp(current->name,nameLower) != 0) {
     current = current->next;
   }
@@ -108,9 +112,13 @@ song_node * remove_node(song_node *front, song_node *remove) {
 }
 
 void free_all(song_node *front) {
-  while (front != NULL) {
-    free(front);
-    front = front->next;
+  song_node *temp;
+  song_node *current = front;
+  while (current != NULL) {
+    temp = current->next;
+    free(current);
+    current = 0;
+    current = temp;
   }
 }
 
@@ -266,6 +274,15 @@ void remove_song(song_node *table[], char nameGiven[], char artistGiven[]) {
   }
 }
 
+void delete_all(song_node *table[]) {
+  printf("Deleting all songs...\n");
+  int i;
+  for (int i = 0; i < 26; i++) {
+    free_all(table[i]);
+    table[i] = 0;
+  }
+}
+
 int main() {
   //SETUP//
   song_node *table[26];
@@ -282,6 +299,14 @@ int main() {
   add_song(table,"test","abc");
   add_song(table,"test1","xyz");
   add_song(table,"test2","ebutnoteee");
+
+  printf("\n===TESTING search_for_name===\n");
+  printf("Pointer to test2: %p\n",search_for_name(table,"test2"));
+  printf("Pointer to ayo: %p\n",search_for_name(table,"ayo"));
+
+  printf("\n===TESTING search_for_artist===\n");
+  printf("Pointer to eee: %p\n",search_for_artist(table,"eee"));
+  printf("Pointer to ayo: %p\n",search_for_artist(table,"ayo"));
 
   printf("\n===TESTING print_library===\n");
   print_library(table);
@@ -300,5 +325,9 @@ int main() {
   printf("\n===TESTING remove_song===\n");
   remove_song(table,"eee","eee");
   print_all_under_letter(table,'e');
+
+  printf("\n===TESTING delete_all===\n");
+  delete_all(table);
+  print_library(table);
   return 0;
 }
