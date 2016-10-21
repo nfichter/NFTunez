@@ -150,14 +150,11 @@ song_node * add_song(song_node *lib, char nameGiven[], char artistGiven[]) {
 }
 
 song_node * search_for_name(song_node *lib, char nameGiven[]) {
-  song_node *current = lib;
-  while (current != NULL) {
-    if (strcmp(current->name,nameGiven) == 0) {
-      return current;
-    }
-    current = current->next;
-  }
-  return NULL;
+  return first_song_by_name(lib,nameGiven);
+}
+
+song_node * search_for_artist(song_node *lib, char artistGiven[]) {
+  return first_song_by_artist(lib,artistGiven);
 }
 
 int main() {
@@ -183,7 +180,13 @@ int main() {
   print_list(lib);
   printf("\n");
   
-  printf("Looking for hola...%p\n",search_for_name(lib,"hola"));
-  printf("Looking for hela...%p\n",search_for_name(lib,"hela"));
+  printf("Looking for hola (name)...%p\n",search_for_name(lib,"hola"));
+  printf("Looking for hela (name)...%p\n",search_for_name(lib,"hela"));
+  printf("\n");
+
+  printf("Looking for ddd (artist)...%p\n",search_for_artist(lib,"ddd"));
+  printf("Looking for abc (artist)...%p\n",search_for_artist(lib,"abc"));
+  printf("\n");
+  
   return 0;
 }
