@@ -89,15 +89,22 @@ song_node * random_node(song_node *front) {
 }
 
 
-void remove_node(song_node *front, song_node *remove) {
+song_node * remove_node(song_node *front, song_node *remove) {
   song_node *current = front;
 
+  if (current == remove) {
+    front = front->next;
+    return front;
+  }
+  
   while (current != NULL) {
     if (current->next == remove) {
       current->next = remove->next;
     }
+    current = current->next;
   }
   free(remove);
+  return front;
 }
 
 void free_all(song_node *front) {
@@ -160,6 +167,8 @@ void add_song(song_node *table[], char nameGiven[], char artistGiven[]) {
   strncpy(artistLower,artistGiven,256);
   lower_string(nameLower);
   lower_string(artistLower);
+
+  printf("Adding song %s - %s...\n",artistLower,nameLower);
   
   table[artistLower[0]-97] = add_song_to_list(table[artistLower[0]-97],nameLower,artistLower);
 }
@@ -238,6 +247,25 @@ void shuffle(song_node *table[]) {
   }
 }
 
+void remove_song(song_node *table[], char nameGiven[], char artistGiven[]) {
+  char nameLower[256];
+  char artistLower[256];
+  strncpy(nameLower,nameGiven,256);
+  strncpy(artistLower,artistGiven,256);
+  lower_string(nameLower);
+  lower_string(artistLower);
+
+  printf("Removing %s - %s\n",artistLower,nameLower);
+  
+  song_node *current = table[artistLower[0]-97];
+  while (current != NULL) {
+    if (strcmp(current->name,nameLower) == 0 && strcmp(current->artist,artistLower) == 0) {
+      current = remove_node(table[artistLower[0]-97],current);
+    }
+    current = current->next;
+  }
+}
+
 int main() {
   //SETUP//
   song_node *table[26];
@@ -268,6 +296,9 @@ int main() {
 
   printf("\n===TESTING shuffle===\n");
   shuffle(table);
-  
+
+  printf("\n===TESTING remove_song===\n");
+  remove_song(table,"eee","eee");
+  print_all_under_letter(table,'e');
   return 0;
 }
